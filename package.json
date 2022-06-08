@@ -1,0 +1,17 @@
+{
+  "name": "api-rest-mongo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev" : "nodemon ./app.js",
+    "start" : "node ./app.js"
+  },
+  "keywords": [],
+  "author": "Enrique Maya <enrique.mg.cd@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.1",
+    "mongoose": "^6.3.6"
+  }
+}
