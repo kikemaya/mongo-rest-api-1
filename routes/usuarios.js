@@ -1,8 +1,18 @@
 "use strict"
 const express = require("express");
 const router = express.Router()
+const Joi = require("joi");
 
 const Usuario = require("./../models/usuario_model")
+
+const schema = Joi.object({
+    nombre: Joi.string()
+        .min(3)
+        .max(10)
+        .required(),
+    email: Joi.string()
+        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+})
 
 async function listarUsuariosActivos() {
     let usuarios = await Usuario.find({ estado: true })
@@ -46,6 +56,10 @@ router.get("/", (req, res) => {
 })
 router.post("/", (req, res) => {
     let body = req.body
+
+    const { error, value } = schema.validate({ nombre: body.nombre, email: body.email })
+    if(error) return res.status(400).json({ error })
+
     let resultado = crearUsuario(body)
 
     resultado
@@ -53,6 +67,10 @@ router.post("/", (req, res) => {
         .catch(err => res.status(400).json({ error: err }))
 })
 router.put("/:email", (req, res) => {
+    const { error, value } = schema.validate({ nombre: req.body.nombre})
+    
+    if(error) return res.status(400).json({ error })
+
     let resultado = actualizarUsuario(req.params.email, req.body)
 
     resultado
