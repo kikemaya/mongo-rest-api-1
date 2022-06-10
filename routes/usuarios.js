@@ -16,6 +16,7 @@ const schema = Joi.object({
 
 async function listarUsuariosActivos() {
     let usuarios = await Usuario.find({ estado: true })
+        .select({ nombre: 1, email: 1 })
     return usuarios
 }
 async function crearUsuario(body) {
@@ -57,31 +58,46 @@ router.get("/", (req, res) => {
 router.post("/", (req, res) => {
     let body = req.body
 
-    const { error, value } = schema.validate({ nombre: body.nombre, email: body.email })
-    if(error) return res.status(400).json({ error })
+    Usuario.findOne({ email: body.email }, (error1, user) => {
+        if(error1) return res.status(500).json({ error1 })
+        if (user) return res.status(400).json({ msg: "El usuario ya existe" })
 
-    let resultado = crearUsuario(body)
+        const { error2 } = schema.validate({ nombre: body.nombre, email: body.email })
+        if (error2) return res.status(400).json({ error2 })
 
-    resultado
-        .then(user => res.status(201).json({ value: user }))
-        .catch(err => res.status(400).json({ error: err }))
+        let resultado = crearUsuario(body)
+
+        resultado
+            .then(user => res.status(201).json({
+                nombre: user.nombre,
+                email: user.email
+            }))
+            .catch(error3 => res.status(400).json({ error: error3 }))
+    })
+
 })
 router.put("/:email", (req, res) => {
-    const { error, value } = schema.validate({ nombre: req.body.nombre})
-    
-    if(error) return res.status(400).json({ error })
+    const { error, value } = schema.validate({ nombre: req.body.nombre })
+
+    if (error) return res.status(400).json({ error })
 
     let resultado = actualizarUsuario(req.params.email, req.body)
 
     resultado
-        .then(valor => res.status(201).json({ valor: valor }))
+        .then(valor => res.status(201).json({
+            nombre: valor.nombre,
+            email: valor.email
+        }))
         .catch(err => res.status(400).json({ error: err }))
 })
 router.delete("/:email", (req, res) => {
     let resultado = desactivarUsuario(req.params.email)
 
     resultado
-        .then(valor => res.json({ usuario: valor }))
+        .then(valor => res.json({
+            nombre: valor.nombre,
+            email: valor.email
+        }))
         .catch(err => res.status(400).json({ error: err }))
 })
 
