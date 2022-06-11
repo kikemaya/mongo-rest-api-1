@@ -1,9 +1,13 @@
 "use strict"
+
 const express = require("express");
+// const jwt = require("jsonwebtoken")
+// const config = require("config")
 const bcrypt = require('bcrypt');
 const router = express.Router()
 const Joi = require("joi");
 
+const verificarToken = require("./../middlewares/auth")
 const Usuario = require("./../models/usuario_model")
 
 const schema = Joi.object({
@@ -49,7 +53,7 @@ async function desactivarUsuario(email) {
     return usuario
 }
 
-router.get("/", (req, res) => {
+router.get("/", verificarToken, verificarToken, (req, res) => {
     let resultado = listarUsuariosActivos()
 
     resultado
@@ -63,8 +67,8 @@ router.post("/", (req, res) => {
         if(error1) return res.status(500).json({ error1 })
         if (user) return res.status(400).json({ msg: "El usuario ya existe" })
 
-        const { error2 } = schema.validate({ nombre: body.nombre, email: body.email })
-        if (error2) return res.status(400).json({ error2 })
+        const { error } = schema.validate({ nombre: body.nombre, email: body.email })
+        if (error) return res.status(400).json({ error })
 
         let resultado = crearUsuario(body)
 
@@ -77,7 +81,7 @@ router.post("/", (req, res) => {
     })
 
 })
-router.put("/:email", (req, res) => {
+router.put("/:email", verificarToken, (req, res) => {
     const { error, value } = schema.validate({ nombre: req.body.nombre })
 
     if (error) return res.status(400).json({ error })
@@ -91,7 +95,7 @@ router.put("/:email", (req, res) => {
         }))
         .catch(err => res.status(400).json({ error: err }))
 })
-router.delete("/:email", (req, res) => {
+router.delete("/:email", verificarToken, (req, res) => {
     let resultado = desactivarUsuario(req.params.email)
 
     resultado

@@ -1,6 +1,7 @@
 "use strict"
 const express = require("express")
 const mongoose = require("mongoose")
+const config = require("config")
 
 const auth = require("./routes/auth")
 const usuarios = require("./routes/usuarios")
@@ -9,7 +10,7 @@ const cursos = require("./routes/cursos")
 const PORT = process.env.PORT || 5000
 const app = new express()
 
-mongoose.connect("mongodb://localhost:27017/demo")
+mongoose.connect(config.get("configDB.HOST"))
     .then(() => console.log("Conectado a MongoDB..."))
     .catch(error => console.error("No se pudo conectar con MongoDB...", error))
 
