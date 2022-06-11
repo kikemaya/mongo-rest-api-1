@@ -1,5 +1,6 @@
 "use strict"
 const express = require("express");
+const bcrypt = require('bcrypt');
 const router = express.Router()
 const Joi = require("joi");
 
@@ -23,7 +24,7 @@ async function crearUsuario(body) {
     let usuario = new Usuario({
         email: body.email,
         nombre: body.nombre,
-        password: body.password,
+        password: bcrypt.hashSync(body.password, 10),
     })
 
     return await usuario.save()

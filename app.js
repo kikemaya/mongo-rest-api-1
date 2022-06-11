@@ -2,6 +2,7 @@
 const express = require("express")
 const mongoose = require("mongoose")
 
+const auth = require("./routes/auth")
 const usuarios = require("./routes/usuarios")
 const cursos = require("./routes/cursos")
 
@@ -15,6 +16,7 @@ mongoose.connect("mongodb://localhost:27017/demo")
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+app.use("/api/v1/auth", auth)
 app.use("/api/v1/usuarios", usuarios)
 app.use("/api/v1/cursos", cursos)
 
