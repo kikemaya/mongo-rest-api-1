@@ -17,9 +17,11 @@ router.post("/", (req, res) => {
             if (!correctPass) return res.status(400).json({ error: "Ok", msg: "Usuario ò contraseña incorrecto..." })
 
             const jwToken = jwt.sign({
-                _id: data.id,
-                nombre: data.nombre,
-                email: data.email
+                usuario: {
+                    _id: data.id,
+                    nombre: data.nombre,
+                    email: data.email
+                }
             }, config.get("configToken.SEED"), { expiresIn: config.get("configToken.exp") });
 
             return res.json({

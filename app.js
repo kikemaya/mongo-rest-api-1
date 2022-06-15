@@ -11,8 +11,8 @@ const PORT = process.env.PORT || 5000
 const app = new express()
 
 mongoose.connect(config.get("configDB.HOST"))
-    .then(() => console.log("Conectado a MongoDB..."))
-    .catch(error => console.error("No se pudo conectar con MongoDB...", error))
+  .then(() => console.log("Conectado a MongoDB..."))
+  .catch(error => console.error("No se pudo conectar con MongoDB...", error))
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))

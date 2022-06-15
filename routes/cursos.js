@@ -1,71 +1,75 @@
 "use strict"
-const express = require("express");
+const express = require("express")
 const router = express.Router()
 
 const verificarToken = require("./../middlewares/auth")
 const Curso = require("./../models/curso_model")
 
 async function listarCursosActivos() {
-    let cursos = await Curso.find({ estado: true })
-    return cursos
+  let cursos = await Curso
+    .find({ estado: true })
+  // .populate("autor", "nombre -_id")
+  return cursos
 }
-async function crearCurso(body) {
-    let curso = new Curso({
-        titulo: body.titulo,
-        descripcion: body.descripcion
-    })
+async function crearCurso(req) {
+  let curso = new Curso({
+    titulo: req.body.titulo,
+    // autor: req.usuario._id,
+    autor: req.usuario,
+    descripcion: req.body.descripcion
+  })
 
-    return await curso.save()
+  return await curso.save()
 }
 async function actualizarCurso(id, body) {
-    let curso = await Curso.findByIdAndUpdate(id, {
-        $set: {
-            titulo: body.titulo,
-            descripcion: body.descripcion
-        }
-    }, { new: true })
+  let curso = await Curso.findByIdAndUpdate(id, {
+    $set: {
+      titulo: body.titulo,
+      descripcion: body.descripcion
+    }
+  }, { new: true })
 
-    return curso
+  return curso
 }
 async function desactivarCurso(id) {
-    let curso = await Curso.findByIdAndUpdate(id, {
-        $set: {
-            estado: false
-        }
-    }, { new: true })
+  let curso = await Curso.findByIdAndUpdate(id, {
+    $set: {
+      estado: false
+    }
+  }, { new: true })
 
-    return curso
+  return curso
 }
 
 router.get("/", verificarToken, (req, res) => {
-    let resultado = listarCursosActivos()
+  let resultado = listarCursosActivos()
 
-    resultado
-        .then(courses => res.status(200).json({ courses }))
-        .catch(err => res.status(400).json({ error: err }))
+  resultado
+    .then(courses => res.status(200).json({ courses }))
+    .catch(err => res.status(400).json({ error: err }))
 })
 router.post("/", verificarToken, (req, res) => {
-    let body = req.body
+  // let body = req.body
 
-    let resultado = crearCurso(body)
+  let resultado = crearCurso(req)
 
-    resultado
-        .then(course => res.status(201).json({ value: course }))
-        .catch(error => res.status(400).json({ error }))
+  resultado
+    .then(course => res.status(201).json({ value: course }))
+    .catch(error => res.status(400).json({ error }))
 })
 router.put("/:id", verificarToken, (req, res) => {
-    let resultado = actualizarCurso(req.params.id, req.body)
+  let resultado = actualizarCurso(req.params.id, req.body)
 
-    resultado
-        .then(curso => res.status(201).json({ curso }))
-        .catch(err => res.status(400).json({ error: err }))
+  resultado
+    .then(curso => res.status(201).json({ curso }))
+    .catch(err => res.status(400).json({ error: err }))
 })
 router.delete("/:id", verificarToken, (req, res) => {
-    let resultado = desactivarCurso(req.params.id)
+  let resultado = desactivarCurso(req.params.id)
 
-    resultado
-        .then(curso => res.status(201).json({ curso }))
-        .catch(error => res.status(400).json({ error }))
+  resultado
+    .then(curso => res.status(201).json({ curso }))
+    .catch(error => res.status(400).json({ error }))
 })
 
 module.exports = router
